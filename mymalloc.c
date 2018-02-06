@@ -7,7 +7,7 @@
 
 static char mainMem[5000];
 
-typedef struct pointerNode {
+/*typedef struct pointerNode {
 	int confirm;
 	void* allocMem;
 	int size
@@ -15,7 +15,7 @@ typedef struct pointerNode {
 	struct pointerNode* prev;
 	struct pointerNode* next;
 } node_t;
-typedef pointerNode* theNode;
+typedef pointerNode* theNode;*/
 
 void insertMem(theNode head, int size, theNode prev, theNode next){
 	head->confirm=1;
