@@ -100,9 +100,11 @@ void myfree(void* ptr){
 	int didDelete=0;
 	while(curr!=NULL){
 		//found the pointer to "free"
-		if(curr==ptr){
+		if(curr->addr==ptr){
+			
 			prev->next=post;
 			didDelete=1;
+			printf("Freed address %p\n", curr->addr);
 			break;
 		}
 		//did not find pointer to "free"

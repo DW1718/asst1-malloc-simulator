@@ -18,5 +18,11 @@ int main(){
 	printf("Address of malloc1 is %p\n", ptr1);
 	void* ptr2 = malloc(1);
 	printf("Address of malloc2 is %p\n", ptr2);
+	free(ptr);
+	printf("Successful free of %p\n", ptr);
+	free(ptr1);
+	printf("Successful free of %p\n", ptr1);
+	free(ptr2);
+	printf("Successful free of %p\n", ptr2);
     return 0;
 }
