@@ -1,20 +1,19 @@
+/*Header file for mymalloc.c and memgrind.c, defines functions that will be used in both files*/
 #ifndef MYMALLOC_H_
 #define MYMALLOC_H_
 
-#define malloc(x) mymalloc(x,__FILE__,__LINE__)
-#define free(x) myfree((void*)(x),__FILE__,__LINE__)
+#define malloc(x) mymalloc(x)
+#define free(x) myfree(x)
 
-void* mymalloc(int size, char* errLoc, int errLine);
-void myfree(void* ptr, char* errLoc, int errLine);
+void* mymalloc (int size);
+void myfree (void* ptr);
 
-typedef struct pointerNode {
-	int confirm;
-	void* allocMem;
-	int size
-	int isFree;
-	struct pointerNode* prev;
+typedef struct pointerNode{
+	char* addr;
+	int size;
+	int location;
 	struct pointerNode* next;
-} node_t;
-typedef pointerNode* theNode;
+}node_t;
+//typedef node_t* nodeEntry;
 
 #endif
