@@ -1,121 +1,120 @@
+/* CS214 SYSTEMS PROGRAMMING ASST1 BY FREDERICK WILLIAM LAU AND JAROOR MODI*/
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
+#include <ctype.h>
 #include <string.h>
-
+#include <errno.h>
 #include "mymalloc.h"
+
 
 static char mainMem[5000];
 
-/*typedef struct pointerNode {
-	int confirm;
-	void* allocMem;
-	int size
-	int isFree;
-	struct pointerNode* prev;
-	struct pointerNode* next;
-} node_t;
-typedef pointerNode* theNode;*/
+node_t *head=NULL;
 
-void insertMem(theNode head, int size, theNode prev, theNode next){
-	head->confirm=1;
-	head->allocMem=((void*)head)+sizeof(node_t);
-	head->size=size;
-	head->isFree=0;
-	head->prev=prev;
-	head->next=next;
+void createNode(node_t* temp, int size, int location){
+	printf("In createNode, size is %d\n", size);
+	//nodeEntry temp = calloc(1, sizeof(node_t));
+	temp->addr=&mainMem[location];
+	temp->size=size;
+	temp->location=location;
+	temp->next=NULL;
 }
 
-void* mymalloc(int size, char* errLoc, int errLine){
-	//error checking for uninitialized memory or exceeding memory space
-	if(mainMem==NULL){
-		printf("Error.  Main memory uninitialized...\n");
-		return NULL;
+void* mymalloc(int size){
+	printf("In mymalloc, size is %d\n", size);
+	int location=0;
+	int memSize=size;
+	node_t *curr = head;
+	//empty list means nothing malloced yet
+	if(curr==NULL){
+		node_t *insert = calloc(1, sizeof(node_t));
+		createNode(insert, memSize, location);
+		curr=insert;
+		printf("In mymalloc, head is empty, created node with size %d at location %d\n", size, location);
+		return insert->addr;
 	}
-	if(size<=0||size>5000){
-		printf("Error.  Unable to allocate memory of size %d\n", size);
-		return NULL;
-	}
-	theNode tempHead = (theNode) mainMem;
-	theNode tempPrev=NULL;
-	theNode tempNext=NULL;
-
-	int temp=5000;
-	while(1){
-		//checks if pointer is initialized
-		if(head->confirm){
-			if(temp>=(sizeof(node_t)+size)){
-				insertMem(tempHead, size, tempPrev, tempNext);
-				if(tempPrev!=NULL){
-					tempPrev->next=tempHead;
-				}
-				return tempHead->allocMem;
+	//shit has been malloced, need to find first adequate space in memory
+	else{
+		//puts us at the first node representing
+		//malloced memory
+		node_t *curr = head;
+		int didInsert=0;
+		int memUsed=0;
+		while(curr->next!=NULL){
+			curr=curr->next;
+			//there is available memory between curr node
+			// and next node and
+			//is enough to malloc what we need
+			if(curr->next!=NULL&&(curr->next->location-(curr->size+curr->location))>=memSize){
+				location=curr->size+curr->location;
+				node_t *insert = calloc(1, sizeof(node_t));
+				createNode(insert, memSize, location);
+				insert->next=curr->next->next;
+				curr->next=insert;
+				didInsert=1;
+				return insert->addr;
 			}
-			printf("Error.  No memory available...\n");
-			return NULL;
-		}
-		//checks if current memory is free and if it has enough space
-		tempPrev=tempHead->prev;
-		tempNext=tempHead->next;
-		if(tempHead->isFree==1 && tempHead->size>=size){
-			//checks previously allocated memory to see if it is larger then
-			//what the user asked for and creates an entry to manage that space
-			if(tempHead->size>size+sizeof(node_t)){
-				void *entry=(void*)tempHead+sizeof(node_t)+size;
-				theNode tempNode=(theNode) voidEntry;
-				insertMem(tempNode, tempHead->size-size-sizeof(node_t), tempHead, tempHead->next);
-				insertMem(tempHead, size, tempPrev, tempEntry);
-				free((void*)tempEntry+sizeof(node_t));
-				return tempHead->allocMem;
-			}
+			//there is not enough free space between these two
+			//"regions" of allocated memory to malloc what we
+			//need, keep iterating until we find a sufficient
+			//space or get to the end of our allocated memory
+			//region, keep track of memory used to be sure we
+			//don't exceed our main memory capacity
 			else{
-				tempHead->isFree=0;
-				return tempHead->allocMem;
+				memUsed+=curr->size;
+				continue;
 			}
 		}
-		if(tempHead->next != NULL){
-			tempHead=tempHead->next;
+		//we got to the end of our allocated memory and did NOT
+		//insert anything, and we have enough space at the end
+		//of our allocated memory region for our malloc, insert
+		//at end
+		if(!didInsert&&(5000-curr->location+curr->size)){
+			location=curr->size+curr->location;
+			node_t *insert = calloc(1, sizeof(node_t));
+			createNode(insert, memSize, location);
+			curr->next = insert;
+			didInsert=1;
+			return insert->addr;
 		}
-		else if((void*)tempHead+sizeof(node_t)+tempHead->size<=(void*)mainMem+5000-sizeof(node_t)){
-			tempPrev=tempHead;
-			tempNext=NULL;
-			void* rmHead=(void*)tempHead+sizeof(node_t)+tempHead->size;
-			tempHead=(theNode) rmHead;
-		}
+		//we either malloced successfully or there is no adequate
+		//region of memory that we can malloc either in the middle
+		//of the array or at the end of the array
 		else{
-			printf("Error.  No memory available...\n");
+			printf("Error.  Unable to allocate memory of size %d\n", memSize);
 			return NULL;
 		}
-		temp=(void*)mainMem+5000-(void*)tempHead;
 	}
 }
 
-void myfree(void* ptr, char* errLoc, int errLine){
-	theNode trash = (theNode)(ptr-sizeof(node_t));
-	//valid pointer?
-	if(!((void*)mainMem<=(void*)trash&&(void*)trash<(void*)(mainMem+5000-sizeof(node_t)))){
-		printf("Error.  Invalid pointer...Out of Range...\n");
+void myfree(void* ptr){
+	node_t *curr=head->next;
+	node_t *prev=head;
+	node_t *post=curr->next;
+	int didDelete=0;
+	while(curr!=NULL){
+		//found the pointer to "free"
+		if(curr==ptr){
+			prev->next=post;
+			didDelete=1;
+			break;
+		}
+		//did not find pointer to "free"
+		//keep iterating
+		else{
+			curr=curr->next;
+			prev=prev->next;
+			post=post->next;
+		}
+	}
+	//pointer does not exist
+	if(!didDelete){
+		printf("Error.  Cannot free a pointer that does not exist herpaderp\n");
 		return;
 	}
-	//valid initialized pointer?
-	if(trash->confirm==0){
-		printf("Error.  Invalid pointer...\n");
-		return;
-	}
-	//already free?
-	if(trash->isFree){
-		printf("Error.  Pointer has already been freed...\n");
-		return;
-	}
-	//free
-	trash->isFree=1;
-	//adjusts nodes to check previous and next pointers
-	if(trash->next !=NULL&&trash->next->isFree){
-		trash->size = trash->size+trash->next->size+sizeof(node_t);
-		trash->next=trasn->next->next;
-	}
-	if(trash->prev!=NULL&&trash->prev->isFree){
-		trash->prev->size = trash->prev->size+trash->size+sizeof(node_t);
-		trash->prev->next=trash->next;
-	}
+	return;
 }
+
+
+
