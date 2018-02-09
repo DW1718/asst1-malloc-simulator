@@ -25,7 +25,7 @@ void testA(){
 
 //malloc 1 byte, store the pointer in an array, do this 150 times
 //Once you've malloced 150 byte chunks, free the 150 1 byte
-//pointers one by one
+//pointers one by one!
 void testB(){
 	int testCount=0;
 	while(testCount<150){
