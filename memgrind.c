@@ -10,19 +10,39 @@ each workload to execute and output them in sequence.*/
 #include <time.h>
 #include "mymalloc.h"
 
+//malloc 1 byte and immediately free it, do this 150 times
+void testA(){
+	int testCount=0;
+	while(testCount<150){
+		int i;
+		for(i=0;i<150;i++){
+			void* ptr = malloc(1);
+			free(ptr);
+		}
+		testCount++;
+	}
+}
+
+//malloc 1 byte, store the pointer in an array, do this 150 times
+//Once you've malloced 150 byte chunks, free the 150 1 byte
+//pointers one by one
+void testB(){
+	int testCount=0;
+	while(testCount<150){
+		int i;
+		char* arr[150];
+		for(i=0;i<150;i++){
+			arr[i]=malloc(1);
+		}
+		for(i=0;i<150;i++){
+			free(arr[i]);
+		}
+		testCount++;
+	}
+}
 
 int main(){
-    void* ptr=malloc(1);
-    printf("Address of malloc is %p\n", ptr);
-	void* ptr1=malloc(5);
-	printf("Address of malloc1 is %p\n", ptr1);
-	void* ptr2 = malloc(1);
-	printf("Address of malloc2 is %p\n", ptr2);
-	free(ptr);
-	printf("Successful free of %p\n", ptr);
-	free(ptr1);
-	printf("Successful free of %p\n", ptr1);
-	free(ptr2);
-	printf("Successful free of %p\n", ptr2);
+	testA();
+	testB();
     return 0;
 }
