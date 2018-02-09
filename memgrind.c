@@ -14,5 +14,9 @@ each workload to execute and output them in sequence.*/
 int main(){
     void* ptr=malloc(1);
     printf("Address of malloc is %p\n", ptr);
+	void* ptr1=malloc(5);
+	printf("Address of malloc1 is %p\n", ptr1);
+	void* ptr2 = malloc(1);
+	printf("Address of malloc2 is %p\n", ptr2);
     return 0;
 }

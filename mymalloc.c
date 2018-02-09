@@ -13,7 +13,7 @@ static char mainMem[5000];
 node_t *head=NULL;
 
 void createNode(node_t* temp, int size, int location){
-	printf("In createNode, size is %d\n", size);
+	//printf("In createNode, size is %d\n", size);
 	//nodeEntry temp = calloc(1, sizeof(node_t));
 	temp->addr=&mainMem[location];
 	temp->size=size;
@@ -22,16 +22,19 @@ void createNode(node_t* temp, int size, int location){
 }
 
 void* mymalloc(int size){
-	printf("In mymalloc, size is %d\n", size);
+	//printf("In mymalloc, size is %d\n", size);
 	int location=0;
 	int memSize=size;
 	node_t *curr = head;
 	//empty list means nothing malloced yet
 	if(curr==NULL){
+		head = calloc(1, sizeof(node_t));
+		head->next = NULL;
+		curr=head;
 		node_t *insert = calloc(1, sizeof(node_t));
 		createNode(insert, memSize, location);
-		curr=insert;
-		printf("In mymalloc, head is empty, created node with size %d at location %d\n", size, location);
+		curr->next=insert;
+		printf("In mymalloc, list is empty, created node with size %d at location %p\n", size, curr->next->addr);
 		return insert->addr;
 	}
 	//shit has been malloced, need to find first adequate space in memory
@@ -76,6 +79,7 @@ void* mymalloc(int size){
 			createNode(insert, memSize, location);
 			curr->next = insert;
 			didInsert=1;
+			printf("Malloced address %p\n", curr->next->addr);
 			return insert->addr;
 		}
 		//we either malloced successfully or there is no adequate
@@ -89,6 +93,7 @@ void* mymalloc(int size){
 }
 
 void myfree(void* ptr){
+	printf("In myfree, attempting to free pointer %p\n", ptr);
 	node_t *curr=head->next;
 	node_t *prev=head;
 	node_t *post=curr->next;
