@@ -41,8 +41,34 @@ void testB(){
 	}
 }
 
+//Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer - do this 150 times
+//Keep track of each operation so that you eventually malloc() 150 bytes, in total
+//Keep track of each operation so that you eventually free() all pointers
+//(don't allow a free() if you have no pointers to free())
+
+void testC(){
+	printf("\n\nTEST C\n\n");
+	int testCount=0;
+	while(testCount<150){
+		int i;
+		float r;
+		void* ptr;
+		for(i=0;i<150;i++){
+			r = (double)rand() / (double)RAND_MAX;
+			if (r<.5){
+				ptr = malloc(1);
+			}
+			else{
+				free(ptr);
+			}
+		}
+		testCount++;
+	}
+}
+
 int main(){
 	testA();
 	testB();
+	testC();
     return 0;
 }

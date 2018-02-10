@@ -101,27 +101,28 @@ void myfree(void* ptr){
 	while(curr!=NULL){
 		//found the pointer to "free"
 		if(curr->addr==ptr){
-			
+
 			prev->next=post;
 			didDelete=1;
 			printf("Freed address %p\n", curr->addr);
+			ptr = NULL;
 			break;
 		}
 		//did not find pointer to "free"
 		//keep iterating
 		else{
-			curr=curr->next;
+			if(curr->next==NULL){
+				break;
+			}
+			curr=curr->next;//segfault here
 			prev=prev->next;
 			post=post->next;
 		}
 	}
 	//pointer does not exist
-	if(!didDelete){
+	if(didDelete == 0){
 		printf("Error.  Cannot free a pointer that does not exist herpaderp\n");
 		return;
 	}
 	return;
 }
-
-
-
