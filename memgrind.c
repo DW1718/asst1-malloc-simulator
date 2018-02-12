@@ -14,9 +14,12 @@ each workload to execute and output them in sequence.*/
 void testA(){
 	int testCount=0;
 	while(testCount<150){
+		printf("Test A number %d...................................................\n", testCount);
 		int i;
 		for(i=0;i<150;i++){
+			printf("Test A malloc\n");
 			void* ptr = malloc(1);
+			printf("Test A free\n");
 			free(ptr);
 		}
 		testCount++;
@@ -29,12 +32,15 @@ void testA(){
 void testB(){
 	int testCount=0;
 	while(testCount<150){
+		printf("Test B number %d...................................................\n", testCount);
 		int i;
 		char* arr[150];
 		for(i=0;i<150;i++){
+			printf("Test B malloc\n");
 			arr[i]=malloc(1);
 		}
 		for(i=0;i<150;i++){
+			printf("Test B free\n");
 			free(arr[i]);
 		}
 		testCount++;
@@ -47,18 +53,20 @@ void testB(){
 //(don't allow a free() if you have no pointers to free())
 
 void testC(){
-	printf("\n\nTEST C\n\n");
 	int testCount=0;
 	while(testCount<150){
+		printf("Test C number %d...................................................\n", testCount);
 		int i;
 		float r;
 		void* ptr;
 		for(i=0;i<150;i++){
 			r = (double)rand() / (double)RAND_MAX;
 			if (r<.5){
+				printf("Test C malloc\n");
 				ptr = malloc(1);
 			}
 			else{
+				printf("Test C free\n");
 				free(ptr);
 			}
 		}

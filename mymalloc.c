@@ -27,6 +27,13 @@ void* mymalloc(int size){
 	int memSize=size;
 	node_t *curr = head;
 	//empty list means nothing malloced yet
+	//there is an issue here where after we are done
+	//freeing all pointers in an iteration, the head
+	//pointer still exists and therefore we are not 
+	//actually starting with an empty list, i'm not
+	//sure if this will cause errors later down the
+	//line but I do not see any obvious way to rectify
+	//this without changing the foundation
 	if(curr==NULL){
 		head = calloc(1, sizeof(node_t));
 		head->next = NULL;
@@ -34,13 +41,14 @@ void* mymalloc(int size){
 		node_t *insert = calloc(1, sizeof(node_t));
 		createNode(insert, memSize, location);
 		curr->next=insert;
-		printf("In mymalloc, list is empty, created node with size %d at location %p\n", size, curr->next->addr);
+		printf("List is empty, created node with size %d at location %p\n", size, curr->next->addr);
 		return insert->addr;
 	}
 	//shit has been malloced, need to find first adequate space in memory
 	else{
 		//puts us at the first node representing
 		//malloced memory
+		printf("List is NOT empty, finding space to malloc...\n");
 		node_t *curr = head;
 		int didInsert=0;
 		int memUsed=0;
@@ -93,7 +101,7 @@ void* mymalloc(int size){
 }
 
 void myfree(void* ptr){
-	printf("In myfree, attempting to free pointer %p\n", ptr);
+	printf("Attempting to free pointer %p...\n", ptr);
 	node_t *curr=head->next;
 	node_t *prev=head;
 	node_t *post=curr->next;
@@ -104,7 +112,7 @@ void myfree(void* ptr){
 
 			prev->next=post;
 			didDelete=1;
-			printf("Freed address %p\n", curr->addr);
+			printf("Freed address %p!\n", curr->addr);
 			ptr = NULL;
 			break;
 		}
