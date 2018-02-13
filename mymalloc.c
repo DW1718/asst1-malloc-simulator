@@ -27,13 +27,6 @@ void* mymalloc(int size){
 	int memSize=size;
 	node_t *curr = head;
 	//empty list means nothing malloced yet
-	//there is an issue here where after we are done
-	//freeing all pointers in an iteration, the head
-	//pointer still exists and therefore we are not 
-	//actually starting with an empty list, i'm not
-	//sure if this will cause errors later down the
-	//line but I do not see any obvious way to rectify
-	//this without changing the foundation
 	if(curr==NULL){
 		head = calloc(1, sizeof(node_t));
 		head->next = NULL;
@@ -41,7 +34,14 @@ void* mymalloc(int size){
 		node_t *insert = calloc(1, sizeof(node_t));
 		createNode(insert, memSize, location);
 		curr->next=insert;
-		printf("List is empty, created node with size %d at location %p\n", size, curr->next->addr);
+		printf("Head is empty, created node with size %d at location %p\n", size, curr->next->addr);
+		return insert->addr;
+	}
+	else if(curr->next==NULL){
+		node_t *insert = calloc(1, sizeof(node_t));
+		createNode(insert, memSize, location);
+		curr->next=insert;
+		printf("Head is NOT empty but .next is, created node with size %d at location %p\n", size, curr->next->addr);
 		return insert->addr;
 	}
 	//shit has been malloced, need to find first adequate space in memory
@@ -64,6 +64,7 @@ void* mymalloc(int size){
 				insert->next=curr->next->next;
 				curr->next=insert;
 				didInsert=1;
+				printf("Malloced middle region of address %p\n", insert->addr);
 				return insert->addr;
 			}
 			//there is not enough free space between these two
@@ -113,7 +114,7 @@ void myfree(void* ptr){
 			prev->next=post;
 			didDelete=1;
 			printf("Freed address %p!\n", curr->addr);
-			ptr = NULL;
+			ptr = NULL;//what is this for?
 			break;
 		}
 		//did not find pointer to "free"
