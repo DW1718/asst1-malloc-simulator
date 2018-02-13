@@ -10,6 +10,10 @@ each workload to execute and output them in sequence.*/
 #include <time.h>
 #include "mymalloc.h"
 
+int getrand(int min,int max){
+     return(rand()%(max-min)+min);
+}
+
 //malloc 1 byte and immediately free it, do this 150 times
 void testA(){
 	int testCount=0;
@@ -75,9 +79,10 @@ void testC(){
 			if (r<.5){
 				printf("Test C malloc...\n");
 				arr[i] = malloc(1);
-				i++;
-				//printf("%d\n", i);
-				printf("Test C malloc is successful!\n");
+				if(arr[i]){
+					printf("Test C malloc is successful!\n");
+					i++;
+				}
 				continue;
 			}
 			else{
@@ -89,7 +94,7 @@ void testC(){
 					if(arr[k]){
 						free(arr[k]);
 						arr[k]=NULL;
-						printf("Test C free is successful\n");
+						printf("Test C free is successful!\n");
 						j++;
 						break;
 					}
@@ -101,10 +106,72 @@ void testC(){
 		testCount++;
 	}
 }
+/*Randomly choose between a randomly-sized malloc() or free()ing a pointer – do this many times (see below)
+
+- Keep track of each malloc so that all mallocs do not exceed your total memory capacity
+
+- Keep track of each operation so that you eventually malloc() 150 times
+
+- Keep track of each operation so that you eventually free() all pointers
+
+- Choose a random allocation size between 1 and 64 bytes
+*/
+void testD(){
+	//test D is giving sensible outputs but is only getting through 6 iterations before
+	//the program gets hung up, also facing the same problem of attempting to free
+	//non existent addresses as in test C which I do not understand because the array
+	//that I am storing the pointers in should only be holding pointers that we
+	//initialized and assigned and I clear the locations of the array appropriately
+	//every time we free a pointer
+	int testCount=0;
+	while(testCount<1){
+		printf("Test D number %d...................................................\n", testCount);
+		int i=0;
+		int j=0;
+		int m;
+		char* arr[150];
+		float r;
+		int memAlloc=0;
+		for(m=0; m<150; m++){
+			arr[m]=NULL;
+		}
+		while(i<150&&j<150){
+			r = (double)rand()/ (double)RAND_MAX;
+			if(r<.5&&memAlloc<=5000){
+				printf("Test D malloc...\n");
+				int rand = getrand(1, 64);
+				arr[i]=malloc(rand);
+				if(arr[i]){
+					printf("Test D malloc is successful!\n");
+					memAlloc+=rand;
+					i++;
+				}
+				continue;
+			}
+			else{
+				int k;
+				for(k=0; k<150; k++){
+					if(arr[k]){
+						free(arr[k]);
+						arr[k]=NULL;
+						printf("Test D free is successful!\n");
+						j++;
+						break;
+					}
+					else{
+						continue;
+					}
+				}
+			}
+		}
+		testCount++;
+	}
+}
 
 int main(){
 	testA();
 	testB();
 	testC();
+	testD();
     return 0;
 }

@@ -22,7 +22,7 @@ void createNode(node_t* temp, int size, int location){
 }
 
 void* mymalloc(int size){
-	//printf("In mymalloc, size is %d\n", size);
+	printf("Mallocing size of %d\n", size);
 	int location=0;
 	int memSize=size;
 	node_t *curr = head;
@@ -64,7 +64,7 @@ void* mymalloc(int size){
 				insert->next=curr->next->next;
 				curr->next=insert;
 				didInsert=1;
-				printf("Malloced middle region of address %p\n", insert->addr);
+				printf("Malloced middle region with size %d at address %p\n", insert->size, insert->addr);
 				return insert->addr;
 			}
 			//there is not enough free space between these two
@@ -88,7 +88,7 @@ void* mymalloc(int size){
 			createNode(insert, memSize, location);
 			curr->next = insert;
 			didInsert=1;
-			printf("Malloced address %p\n", curr->next->addr);
+			printf("Malloced at END region of size %d at address %p\n", curr->next->size, curr->next->addr);
 			return insert->addr;
 		}
 		//we either malloced successfully or there is no adequate
