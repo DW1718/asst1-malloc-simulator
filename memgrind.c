@@ -164,6 +164,7 @@ void testD(){
 				}
 			}
 		}
+		printf("Total memory allocation in D is %d\n", memAlloc);
 		testCount++;
 	}
 }
