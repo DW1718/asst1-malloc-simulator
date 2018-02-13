@@ -1,6 +1,7 @@
 # Asst1
 CS 214: Systems Programming, Spring 2018
-Developed by Frederick William Lau and Jaroor Modi
+
+Completed by Frederick William Lau and Jaroor Modi
 
 Assignment 1: To Build A Better Malloc
 
