@@ -2,11 +2,11 @@
 #ifndef MYMALLOC_H_
 #define MYMALLOC_H_
 
-#define malloc(x) mymalloc(x)
-#define free(x) myfree(x)
+#define malloc(x) mymalloc(x,__FILE__,__LINE__)
+#define free(x) myfree(x,__FILE__,__LINE__)
 
-void* mymalloc (int size);
-void myfree (void* ptr);
+void* mymalloc (int size, const char * file_name, int line_number);
+void myfree (void* ptr, const char * file_name, int line_number);
 
 typedef struct pointerNode{
 	char* addr;

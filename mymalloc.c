@@ -11,6 +11,7 @@
 static char mainMem[5000];
 
 node_t *head=NULL;
+void *prev_freed=NULL;
 
 void createNode(node_t* temp, int size, int location){
 	//printf("In createNode, size is %d\n", size);
@@ -21,7 +22,7 @@ void createNode(node_t* temp, int size, int location){
 	temp->next=NULL;
 }
 
-void* mymalloc(int size){
+void* mymalloc(int size, const char * file_name, int line_number){
 	printf("Mallocing size of %d\n", size);
 	int location=0;
 	int memSize=size;
@@ -34,21 +35,21 @@ void* mymalloc(int size){
 		node_t *insert = calloc(1, sizeof(node_t));
 		createNode(insert, memSize, location);
 		curr->next=insert;
-		printf("Head is empty, created node with size %d at location %p\n", size, curr->next->addr);
+		//~printf("Head is empty, created node with size %d at location %p\n", size, curr->next->addr);
 		return insert->addr;
 	}
 	else if(curr->next==NULL){
 		node_t *insert = calloc(1, sizeof(node_t));
 		createNode(insert, memSize, location);
 		curr->next=insert;
-		printf("Head is NOT empty but .next is, created node with size %d at location %p\n", size, curr->next->addr);
+		//~printf("Head is NOT empty but .next is, created node with size %d at location %p\n", size, curr->next->addr);
 		return insert->addr;
 	}
-	//shit has been malloced, need to find first adequate space in memory
+	//memory has been malloced, need to find first adequate space in memory
 	else{
 		//puts us at the first node representing
 		//malloced memory
-		printf("List is NOT empty, finding space to malloc...\n");
+		//~printf("List is NOT empty, finding space to malloc...\n");
 		node_t *curr = head;
 		int didInsert=0;
 		int memUsed=0;
@@ -64,7 +65,7 @@ void* mymalloc(int size){
 				insert->next=curr->next->next;
 				curr->next=insert;
 				didInsert=1;
-				printf("Malloced middle region with size %d at address %p\n", insert->size, insert->addr);
+				//~printf("Malloced middle region with size %d at address %p\n", insert->size, insert->addr);
 				return insert->addr;
 			}
 			//there is not enough free space between these two
@@ -88,21 +89,25 @@ void* mymalloc(int size){
 			createNode(insert, memSize, location);
 			curr->next = insert;
 			didInsert=1;
-			printf("Malloced at END region of size %d at address %p\n", curr->next->size, curr->next->addr);
+			//~printf("Malloced at END region of size %d at address %p\n", curr->next->size, curr->next->addr);
 			return insert->addr;
 		}
 		//we either malloced successfully or there is no adequate
 		//region of memory that we can malloc either in the middle
 		//of the array or at the end of the array
 		else{
-			printf("Error.  Unable to allocate memory of size %d\n", memSize);
+			printf("ERROR: In file %s line %d, unable to allocate memory block of size %d due to memory saturation.\n", file_name, line_number, memSize);
 			return NULL;
 		}
 	}
 }
 
-void myfree(void* ptr){
+void myfree(void* ptr, const char * file_name, int line_number){
 	printf("Attempting to free pointer %p...\n", ptr);
+	if (ptr==prev_freed){
+		printf("ERROR: In file %s line %d attempting to free pointer consecutive times without malloc()ing.\n", file_name, line_number);
+		return;
+	}
 	node_t *curr=head->next;
 	node_t *prev=head;
 	node_t *post=curr->next;
@@ -128,10 +133,11 @@ void myfree(void* ptr){
 			post=post->next;
 		}
 	}
-	//pointer does not exist
+	//pointer was not malloc()ed since last free()ing.
 	if(didDelete == 0){
-		printf("Error.  Cannot free a pointer that does not exist herpaderp\n");
+		printf("ERROR: In file %s line %d attempting to free pointer which was not malloc()ed.\n", file_name, line_number);
 		return;
 	}
+	prev_freed = ptr;
 	return;
 }

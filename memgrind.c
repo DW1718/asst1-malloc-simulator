@@ -4,11 +4,26 @@ should record the run time for each workload and store it.  When all 100 iterati
 of all the workloads have been run, memgrind.c should calculate the mean time for
 each workload to execute and output them in sequence.*/
 
+//NEED TO FREE ALL MEMORY USED AFTER EACH TEST
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
 #include "mymalloc.h"
+
+int NUM_TESTS = 3;
+
+void printresults(double **res){
+	int i,j;
+	printf("\n");
+	for(i=0;i<NUM_TESTS;i++){
+		for(j=0;j<4;j++){
+			printf("%f\t", res[i][j]);
+		}
+		printf("\n");
+	}
+}
 
 int getrand(int min,int max){
      return(rand()%(max-min)+min);
@@ -58,6 +73,7 @@ void testB(){
 
 void testC(){
 	int testCount=0;
+	//RESOLVED(this is fine):
 	//if we run only 1 iteration we don't get any attempts to free a non existent address
 	//but once we run more then 1 iteration we start to see attempts to free non existent
 	//addresses, need to figure out why, I think it has something to do with the actual
@@ -94,7 +110,7 @@ void testC(){
 					if(arr[k]){
 						free(arr[k]);
 						arr[k]=NULL;
-						printf("Test C free is successful!\n");
+						//printf("Test C free is successful!\n");
 						j++;
 						break;
 					}
@@ -128,6 +144,7 @@ void testD(){
 		printf("Test D number %d...................................................\n", testCount);
 		int i=0;
 		int j=0;
+		int iter = 0;
 		int m;
 		char* arr[150];
 		float r;
@@ -136,6 +153,7 @@ void testD(){
 			arr[m]=NULL;
 		}
 		while(i<150&&j<150){
+			printf("Test D ITERATION NUMBER %d\n", iter);
 			r = (double)rand()/ (double)RAND_MAX;
 			if(r<.5&&memAlloc<=5000){
 				printf("Test D malloc...\n");
@@ -163,16 +181,56 @@ void testD(){
 					}
 				}
 			}
+			iter++;
 		}
 		printf("Total memory allocation in D is %d\n", memAlloc);
 		testCount++;
 	}
 }
 
+void testE(){
+	return;
+}
+
+void testF(){
+	return;
+}
+
 int main(){
-	testA();
-	testB();
-	testC();
-	testD();
-    return 0;
+	int rows = NUM_TESTS, cols= 4, i, j, count;
+	clock_t startA, diffA, startB, diffB, startC, diffC, startD, diffD;
+	count = 0;
+	double **results = (double **)malloc(rows * sizeof(double *));
+	for (i=0; i<rows; i++){
+		results[i] = (double *)malloc(cols * sizeof(double));
+	}
+	j=0;
+	while(count<NUM_TESTS){
+		startA=clock();
+		testA();
+		diffA=clock()-startA;
+		results[j][0] = diffA*1000/CLOCKS_PER_SEC;
+
+		startB=clock();
+		testB();
+		diffB=clock()-startB;
+		results[j][1] = diffB*1000/CLOCKS_PER_SEC;
+
+		startC=clock();
+		testC();//memory becomes saturated after a few test sequences
+		diffC=clock()-startC;
+		results[j][2] = diffC*1000/CLOCKS_PER_SEC;
+
+		startD=clock();
+		testD();//doesn't even run in this sometimes
+		diffD=clock()-startD;
+		results[j][3] = diffD*1000/CLOCKS_PER_SEC;
+
+		j++;
+		count ++;
+	}
+
+	printresults(results);
+
+	return 0;
 }
