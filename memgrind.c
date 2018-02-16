@@ -69,7 +69,7 @@ void testC(){
 		while(i<150){
 			r = (double)rand() / (double)RAND_MAX;
 			if (r<.5){
-				//printf("Test C malloc...\n");
+				printf("Test C malloc...%d\n", i);
 				arr[i] = malloc(1);
 				i++;
 				continue;
@@ -79,6 +79,7 @@ void testC(){
 				//output says we are trying to free a NULL pointer, how?
 				for(k=0; k<150; k++){
 					if(arr[k]){
+						printf("Test C free...\n");
 						free(arr[k]);
 						arr[k]=NULL;
 						break;
@@ -167,16 +168,82 @@ void testF(){
 
 int main(){
 	int total=0;
-	int avg;
 	int i;
+	int j=0;
+	int res[600];
 	struct timeval start, end;
+
 	for(i=0; i<100;i++){
+		//testA
+		gettimeofday(&start, NULL);
+		testA();
+		gettimeofday(&end, NULL);
+		total=total+((end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec));
+		res[j]=total;
+		j++;
+
+		//testB
+		total=0;
+		gettimeofday(&start, NULL);
+		testB();
+		gettimeofday(&end, NULL);
+		total=total+((end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec));
+		res[j]=total;
+		j++;
+
+		//testC
+		total=0;
 		gettimeofday(&start, NULL);
 		testC();
+		gettimeofday(&end, NULL);
 		total=total+((end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec));
+		res[j]=total;
+		j++;
+
+		/*testD
+		total=0;
+		gettimeofday(&start, NULL);
+		testD();
+		gettimeofday(&end, NULL);
+		total=total+((end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec));
+		char[j]=total;
+		j++;*/
+
 	}
-	avg=total/100;
-	printf("Average run time:%dms\n", avg);
+
+	int k;
+	int aRes=0;
+	for(k=0;k<100;k++){
+		aRes+=res[k];
+	}
+	printf("Test A average time is %d milliseconds\n", aRes/100);
+
+	int bRes=0;
+	for(k=100;k<200;k++){
+		bRes+=res[k];
+	}
+	printf("Test B average time is %d milliseconds\n", bRes/100);
+
+	int cRes=0;
+	for(k=200;k<300;k++){
+		cRes+=res[k];
+	}
+	printf("Test C average time is %d milliseconds\n", cRes/100);
+
+	/*int dRes=0;
+	for(k=300;k<400;k++){
+		dRes+=res[k];
+	}
+
+	int eRes=0;
+	for(k=400;k<500;k++){
+		eRes+=res[k];
+	}
+
+	int fRes=0;
+	for(k=500;k<600;k++){
+		fRes+=res[k];
+	}*/
 
 	return 0;
 }
