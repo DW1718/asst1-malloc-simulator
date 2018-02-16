@@ -23,7 +23,7 @@ void createNode(node_t* temp, int size, int location){
 }
 
 void* mymalloc(int size, const char * file_name, int line_number){
-	printf("Mallocing size of %d\n", size);
+	//printf("Mallocing size of %d\n", size);
 	int location=0;
 	int memSize=size;
 	node_t *curr = head;
@@ -103,7 +103,7 @@ void* mymalloc(int size, const char * file_name, int line_number){
 }
 
 void myfree(void* ptr, const char * file_name, int line_number){
-	printf("Attempting to free pointer %p...\n", ptr);
+	//printf("Attempting to free pointer %p...\n", ptr);
 	if (ptr==prev_freed){
 		printf("ERROR: In file %s line %d attempting to free pointer consecutive times without malloc()ing.\n", file_name, line_number);
 		return;
@@ -118,7 +118,7 @@ void myfree(void* ptr, const char * file_name, int line_number){
 
 			prev->next=post;
 			didDelete=1;
-			printf("Freed address %p!\n", curr->addr);
+			//printf("Freed address %p!\n", curr->addr);
 			ptr = NULL;//what is this for?
 			break;
 		}

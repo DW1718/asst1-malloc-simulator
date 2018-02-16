@@ -12,18 +12,6 @@ each workload to execute and output them in sequence.*/
 #include <time.h>
 #include "mymalloc.h"
 
-int NUM_TESTS = 3;
-
-void printresults(double **res){
-	int i,j;
-	printf("\n");
-	for(i=0;i<NUM_TESTS;i++){
-		for(j=0;j<4;j++){
-			printf("%f\t", res[i][j]);
-		}
-		printf("\n");
-	}
-}
 
 int getrand(int min,int max){
      return(rand()%(max-min)+min);
@@ -81,7 +69,7 @@ void testC(){
 		while(i<150){
 			r = (double)rand() / (double)RAND_MAX;
 			if (r<.5){
-				printf("Test C malloc...\n");
+				//printf("Test C malloc...\n");
 				arr[i] = malloc(1);
 				i++;
 				continue;
@@ -125,6 +113,7 @@ void testD(){
 		int i=0;
 		int j=0;
 		int iter = 0;
+		int memAlloc=0;
 		int m;
 		char* arr[150];
 		float r;
@@ -177,40 +166,17 @@ void testF(){
 }
 
 int main(){
-	int rows = NUM_TESTS, cols= 4, i, j, count;
-	clock_t startA, diffA, startB, diffB, startC, diffC, startD, diffD;
-	count = 0;
-	double **results = (double **)malloc(rows * sizeof(double *));
-	for (i=0; i<rows; i++){
-		results[i] = (double *)malloc(cols * sizeof(double));
+	int total=0;
+	int avg;
+	int i;
+	struct timeval start, end;
+	for(i=0; i<100;i++){
+		gettimeofday(&start, NULL);
+		testC();
+		total=total+((end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec));
 	}
-	j=0;
-	while(count<NUM_TESTS){
-		startA=clock();
-		testA();
-		diffA=clock()-startA;
-		results[j][0] = diffA*1000/CLOCKS_PER_SEC;
-
-		startB=clock();
-		testB();
-		diffB=clock()-startB;
-		results[j][1] = diffB*1000/CLOCKS_PER_SEC;
-
-		startC=clock();
-		testC();//memory becomes saturated after a few test sequences
-		diffC=clock()-startC;
-		results[j][2] = diffC*1000/CLOCKS_PER_SEC;
-
-		startD=clock();
-		testD();//doesn't even run in this sometimes
-		diffD=clock()-startD;
-		results[j][3] = diffD*1000/CLOCKS_PER_SEC;
-
-		j++;
-		count ++;
-	}
-
-	printresults(results);
+	avg=total/100;
+	printf("Average run time:%dms\n", avg);
 
 	return 0;
 }
