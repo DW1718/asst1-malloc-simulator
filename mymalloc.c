@@ -10,6 +10,7 @@
 
 static char mainMem[5000];
 
+
 node_t *head=NULL;
 void *prev_freed=NULL;
 
@@ -104,6 +105,11 @@ void* mymalloc(int size, const char * file_name, int line_number){
 
 void myfree(void* ptr, const char * file_name, int line_number){
 	//printf("Attempting to free pointer %p...\n", ptr);
+	if(ptr==NULL){
+		printf("ERROR: In file %s line %d attempting to free NULL\n", file_name, line_number);
+		return;
+
+	}
 	if (ptr==prev_freed){
 		printf("ERROR: In file %s line %d attempting to free pointer consecutive times without malloc()ing.\n", file_name, line_number);
 		return;

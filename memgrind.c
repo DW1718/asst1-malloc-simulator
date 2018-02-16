@@ -41,6 +41,7 @@ void testB(){
 		for(i=0;i<150;i++){
 			printf("Test B free\n");
 			free(arr[i]);
+			arr[i]=NULL;
 		}
 }
 
@@ -86,6 +87,7 @@ void testC(){
 		//clear the remaining array
 		for(j=0; j<150; j++){
 			free(arr[j]);
+			arr[j]=NULL;
 		}
 }
 /*Randomly choose between a randomly-sized malloc() or free()ing a pointer – do this many times (see below)
@@ -142,12 +144,14 @@ void testD(){
 		//clear the remaining array
 		for(j=0; j<150; j++){
 			free(arr[j]);
+			arr[j]=NULL;
 		}
 
 }
 
 void testE(){
-	return;
+	void* ptr=malloc(5100);
+	free(ptr);
 }
 
 void testF(){
@@ -197,6 +201,15 @@ int main(){
 		res[j]=total;
 		j++;
 
+		//testE
+		total=0;
+		gettimeofday(&start, NULL);
+		testE();
+		gettimeofday(&end, NULL);
+		total=total+((end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec));
+		res[j]=total;
+		j++;
+
 	}
 
 	int k;
@@ -225,12 +238,14 @@ int main(){
 
 	printf("Test D average time is %d milliseconds\n", dRes/100);
 
-	/*int eRes=0;
+	int eRes=0;
 	for(k=400;k<500;k++){
 		eRes+=res[k];
 	}
 
-	int fRes=0;
+	printf("Test E average time is %d milliseconds\n", eRes/100);
+
+	/*int fRes=0;
 	for(k=500;k<600;k++){
 		fRes+=res[k];
 	}*/
