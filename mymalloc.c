@@ -13,6 +13,17 @@ static char mainMem[5000];
 
 node_t *head=NULL;
 void *prev_freed=NULL;
+int remainingMem=5000;
+
+void refreshRemaining(){
+	node_t *curr = head;
+	int used = 0;
+	while(curr!=NULL){
+		used+=curr->size;
+		curr=curr->next;
+	}
+	remainingMem=(5000-used);
+}
 
 void createNode(node_t* temp, int size, int location){
 	//printf("In createNode, size is %d\n", size);
@@ -28,6 +39,11 @@ void* mymalloc(int size, const char * file_name, int line_number){
 	int location=0;
 	int memSize=size;
 	node_t *curr = head;
+	refreshRemaining();
+	if(memSize>=remainingMem){
+		printf("ERROR: In file %s line %d, unable to allocate memory block of size %d due to memory saturation.\n", file_name, line_number, memSize);
+		return NULL;
+	}
 	//empty list means nothing malloced yet
 	if(curr==NULL){
 		head = calloc(1, sizeof(node_t));

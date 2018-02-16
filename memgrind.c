@@ -156,8 +156,8 @@ void testE(){
 		int randomNum=getrand(0, 10000);
 		printf("Test E malloc\n");
 		void* ptr=malloc(randomNum);
-		free(ptr);
 		printf("Test E free\n");
+		free(ptr);
 	}
 }
 
@@ -166,7 +166,7 @@ void testF(){
 	int randomNum;
 	char* arr[150];
 	for(i=0;i<150;i++){
-		randomNum=getrand(10, 50);
+		randomNum=getrand(34, 100);
 		printf("Test F malloc\n");
 		arr[i]=malloc(randomNum);
 	}
