@@ -37,7 +37,7 @@ void testA(){
 			void* ptr = malloc(1);
 			printf("Test A free\n");
 			free(ptr);
-		}	
+		}
 }
 
 //malloc 1 byte, store the pointer in an array, do this 150 times
@@ -128,16 +128,15 @@ void testD(){
 		int m;
 		char* arr[150];
 		float r;
-		int memAlloc=0;
 		for(m=0; m<150; m++){
 			arr[m]=NULL;
 		}
-		while(i<150&&j<150){
+		while(i<150){
 			printf("Test D ITERATION NUMBER %d\n", iter);
 			r = (double)rand()/ (double)RAND_MAX;
-			if(r<.5&&memAlloc<=5000){
+			int rand = getrand(1, 64);
+			if(r<.5&&(memAlloc+rand)<=5000){
 				printf("Test D malloc...\n");
-				int rand = getrand(1, 64);
 				arr[i]=malloc(rand);
 				if(arr[i]){
 					printf("Test D malloc is successful!\n");
@@ -153,7 +152,6 @@ void testD(){
 						free(arr[k]);
 						arr[k]=NULL;
 						printf("Test D free is successful!\n");
-						j++;
 						break;
 					}
 					else{
@@ -163,8 +161,11 @@ void testD(){
 			}
 			iter++;
 		}
-		printf("Total memory allocation in D is %d\n", memAlloc);
-	
+		for(j=0; j<150; j++){//free()ing all pointers in memory
+			free(arr[j]);
+		}
+		printf("Total memory allocation in D was %d\n", memAlloc);
+
 }
 
 void testE(){
