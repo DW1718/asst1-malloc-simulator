@@ -50,12 +50,6 @@ void testB(){
 //(don't allow a free() if you have no pointers to free())
 
 void testC(){
-	//RESOLVED(this is fine):
-	//if we run only 1 iteration we don't get any attempts to free a non existent address
-	//but once we run more then 1 iteration we start to see attempts to free non existent
-	//addresses, need to figure out why, I think it has something to do with the actual
-	//memory being recycled but i'm not sure how to verify or solve this if this is the case
-	//regardless, this testC function is the correct structure in which we need to run testC
 		int i=0;
 		int j=0;
 		float r;
@@ -105,56 +99,50 @@ void testC(){
 - Choose a random allocation size between 1 and 64 bytes
 */
 void testD(){
-	//test D is giving sensible outputs but is only getting through 6 iterations before
-	//the program gets hung up, also facing the same problem of attempting to free
-	//non existent addresses as in test C which I do not understand because the array
-	//that I am storing the pointers in should only be holding pointers that we
-	//initialized and assigned and I clear the locations of the array appropriately
-	//every time we free a pointer
 		int i=0;
 		int j=0;
-		int iter = 0;
+		int randomNum;
 		int memAlloc=0;
-		int m;
-		char* arr[150];
 		float r;
+		char *arr[150];
+		int mem[150];
+		int m;
 		for(m=0; m<150; m++){
-			arr[m]=NULL;
+			arr[m] = NULL;
 		}
+
 		while(i<150){
-			printf("Test D ITERATION NUMBER %d\n", iter);
-			r = (double)rand()/ (double)RAND_MAX;
-			int rand = getrand(1, 64);
-			if(r<.5&&(memAlloc+rand)<=5000){
-				printf("Test D malloc...\n");
-				arr[i]=malloc(rand);
-				if(arr[i]){
-					printf("Test D malloc is successful!\n");
-					memAlloc+=rand;
-					i++;
-				}
+			r = (double)rand() / (double)RAND_MAX;
+			randomNum=getrand(1, 64);
+			if (r<.5&&((memAlloc+randomNum)<=5000)){
+				printf("Test D malloc...%d\n", i);
+				arr[i] = malloc(randomNum);
+				mem[i]=randomNum;
+				memAlloc+=randomNum;
+				i++;
 				continue;
 			}
 			else{
 				int k;
+				//output says we are trying to free a NULL pointer, how?
 				for(k=0; k<150; k++){
 					if(arr[k]){
+						printf("Test D free...\n");
 						free(arr[k]);
 						arr[k]=NULL;
-						printf("Test D free is successful!\n");
+						memAlloc-=mem[k];
 						break;
 					}
-					else{
+					else
 						continue;
-					}
 				}
 			}
-			iter++;
+			printf("memAlloc is %d\n", memAlloc);
 		}
-		for(j=0; j<150; j++){//free()ing all pointers in memory
+		//clear the remaining array
+		for(j=0; j<150; j++){
 			free(arr[j]);
 		}
-		printf("Total memory allocation in D was %d\n", memAlloc);
 
 }
 
@@ -200,14 +188,14 @@ int main(){
 		res[j]=total;
 		j++;
 
-		/*testD
+		//testD
 		total=0;
 		gettimeofday(&start, NULL);
 		testD();
 		gettimeofday(&end, NULL);
 		total=total+((end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec));
-		char[j]=total;
-		j++;*/
+		res[j]=total;
+		j++;
 
 	}
 
@@ -230,12 +218,14 @@ int main(){
 	}
 	printf("Test C average time is %d milliseconds\n", cRes/100);
 
-	/*int dRes=0;
+	int dRes=0;
 	for(k=300;k<400;k++){
 		dRes+=res[k];
 	}
 
-	int eRes=0;
+	printf("Test D average time is %d milliseconds\n", dRes/100);
+
+	/*int eRes=0;
 	for(k=400;k<500;k++){
 		eRes+=res[k];
 	}
