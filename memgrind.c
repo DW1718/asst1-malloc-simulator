@@ -149,13 +149,32 @@ void testD(){
 
 }
 
+//malloc random value between 0 and 10000 a 150 times
 void testE(){
-	void* ptr=malloc(5100);
-	free(ptr);
+	int i;
+	for(i=0; i<150; i++){
+		int randomNum=getrand(0, 10000);
+		printf("Test E malloc\n");
+		void* ptr=malloc(randomNum);
+		free(ptr);
+		printf("Test E free\n");
+	}
 }
 
 void testF(){
-	return;
+	int i;
+	int randomNum;
+	char* arr[150];
+	for(i=0;i<150;i++){
+		randomNum=getrand(10, 50);
+		printf("Test F malloc\n");
+		arr[i]=malloc(randomNum);
+	}
+	for(i=0;i<150;i++){
+		printf("Test F free\n");
+		free(arr[i]);
+		arr[i]=NULL;
+	}
 }
 
 int main(){
@@ -210,6 +229,15 @@ int main(){
 		res[j]=total;
 		j++;
 
+		//testF
+		total=0;
+		gettimeofday(&start, NULL);
+		testF();
+		gettimeofday(&end, NULL);
+		total=total+((end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec));
+		res[j]=total;
+		j++;
+
 	}
 
 	int k;
@@ -245,10 +273,12 @@ int main(){
 
 	printf("Test E average time is %d milliseconds\n", eRes/100);
 
-	/*int fRes=0;
+	int fRes=0;
 	for(k=500;k<600;k++){
 		fRes+=res[k];
-	}*/
+	}
+
+	printf("Test F average time is %d milliseconds\n", fRes/100);
 
 	return 0;
 }
