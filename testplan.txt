@@ -1,0 +1,10 @@
+The two new workloads we have implemented test the functions as follows:
+
+E: malloc() a block of a random size between 0 and 10000 bytes and free it 150 times.
+
+This test is designed to make sure the malloc() function can always detect memory saturation.
+This also tests how well the free() function can test free calls to NULL pointers, which is what the malloc() function returns if the call would lead to memory saturation.
+
+F: malloc() blocks of a random size between 34 and 100 bytes and store the pointers in an array. This means we will always have memory saturation and then we free all of the pointers allocated one by one.
+
+This test is designed to make sure malloc will not fail to detect saturation even when various amounts of memory have been allocated beforehand (note that 34 is the lower bound on the randomly generated block size and 34*150=5100, guaranteeing a failure somewhere).
